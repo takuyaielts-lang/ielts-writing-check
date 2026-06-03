@@ -2,13 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { supabaseAdmin } from "@/lib/supabase";
 
+// Vercel Hobby: 60秒 / Pro: 300秒まで延長可能
+export const maxDuration = 60;
+
 // クライアントはリクエスト時に生成（環境変数の読み込みタイミング問題を回避）
 function getClient() {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     throw new Error("ANTHROPIC_API_KEY is not set in environment variables");
   }
-  return new Anthropic({ apiKey });
+  return new Anthropic({
+    apiKey,
+    timeout: 50_000,   // 50秒（maxDuration 60秒より短く設定）
+    maxRetries: 1,
+  });
 }
 
 export async function POST(req: NextRequest) {
