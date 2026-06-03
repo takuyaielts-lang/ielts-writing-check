@@ -1,0 +1,3 @@
+module.exports=[69449,e=>{"use strict";async function t(){if(void 0!==globalThis.localStorage){let e={};globalThis.localStorage={getItem:t=>e[t]??null,setItem:(t,l)=>{e[t]=l},removeItem:t=>{delete e[t]},clear:()=>{Object.keys(e).forEach(t=>delete e[t])},key:t=>Object.keys(e)[t]??null,get length(){return Object.keys(e).length}}}}e.s(["register",0,t])}];
+
+//# sourceMappingURL=instrumentation_ts_1oq3o45._.js.map

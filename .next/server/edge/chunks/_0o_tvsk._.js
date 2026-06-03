@@ -1,0 +1,3 @@
+(globalThis.TURBOPACK||(globalThis.TURBOPACK=[])).push(["chunks/_0o_tvsk._.js",10977,e=>{"use strict";async function t(){if(void 0!==globalThis.localStorage){let e={};globalThis.localStorage={getItem:t=>e[t]??null,setItem:(t,l)=>{e[t]=l},removeItem:t=>{delete e[t]},clear:()=>{Object.keys(e).forEach(t=>delete e[t])},key:t=>Object.keys(e)[t]??null,get length(){return Object.keys(e).length}}}}e.s(["register",0,t])},59858,(e,t,l)=>{self._ENTRIES||={};let n=Promise.resolve().then(()=>e.i(10977));n.catch(()=>{}),self._ENTRIES.middleware_instrumentation=new Proxy(n,{get(e,t){if("then"===t)return(t,l)=>e.then(t,l);let l=(...l)=>e.then(e=>(0,e[t])(...l));return l.then=(l,n)=>e.then(e=>e[t]).then(l,n),l}})}]);
+
+//# sourceMappingURL=_0o_tvsk._.js.map
