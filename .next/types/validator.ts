@@ -83,6 +83,24 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../app/api/speaking/upload/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/speaking/upload">> = Specific
+  const handler = {} as typeof import("../../app/api/speaking/upload/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../app/api/submit/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/submit">> = Specific
+  const handler = {} as typeof import("../../app/api/submit/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 
 
 

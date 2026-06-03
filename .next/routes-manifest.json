@@ -58,6 +58,18 @@
       "regex": "^/api/score(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/api/score(?:/)?$"
+    },
+    {
+      "page": "/api/speaking/upload",
+      "regex": "^/api/speaking/upload(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/speaking/upload(?:/)?$"
+    },
+    {
+      "page": "/api/submit",
+      "regex": "^/api/submit(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/submit(?:/)?$"
     }
   ],
   "dataRoutes": [],

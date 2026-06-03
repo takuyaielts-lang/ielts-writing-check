@@ -4,5 +4,7 @@
   "/admin/page": "app/admin/page.js",
   "/api/admin/submissions/route": "app/api/admin/submissions/route.js",
   "/api/score/route": "app/api/score/route.js",
+  "/api/speaking/upload/route": "app/api/speaking/upload/route.js",
+  "/api/submit/route": "app/api/submit/route.js",
   "/page": "app/page.js"
 }

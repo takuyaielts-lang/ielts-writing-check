@@ -3,6 +3,9 @@
   "functions": {
     "/api/score": {
       "maxDuration": 60
+    },
+    "/api/speaking/upload": {
+      "maxDuration": 60
     }
   }
 }

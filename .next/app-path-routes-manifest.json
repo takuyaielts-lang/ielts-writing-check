@@ -4,5 +4,7 @@
   "/admin/page": "/admin",
   "/api/admin/submissions/route": "/api/admin/submissions",
   "/api/score/route": "/api/score",
+  "/api/speaking/upload/route": "/api/speaking/upload",
+  "/api/submit/route": "/api/submit",
   "/page": "/"
 }

@@ -13,6 +13,7 @@ const noopStorage = {
 export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
   auth: { persistSession: false, autoRefreshToken: false, storage: noopStorage },
 });
+
 export const supabaseAdmin = createClient(supabaseUrl, supabaseSecretKey, {
   auth: { persistSession: false, autoRefreshToken: false, storage: noopStorage },
 });
@@ -20,18 +21,27 @@ export const supabaseAdmin = createClient(supabaseUrl, supabaseSecretKey, {
 export interface Submission {
   id?: string;
   created_at?: string;
-  task_type: string;
-  question_id: number;
-  question_text: string;
-  user_essay: string;
-  word_count: number;
-  score_ta: number;
-  score_cc: number;
-  score_lr: number;
-  score_gra: number;
-  band_score: number;
-  strengths: string[];
-  improvements: string[];
-  detailed_feedback: string;
+  name: string;
+  listening_correct?: number | null;
+  listening_band?: number | null;
+  reading_correct?: number | null;
+  reading_band?: number | null;
+  writing_t1_question?: string | null;
+  writing_t1_essay?: string | null;
+  writing_t1_ta?: number | null;
+  writing_t1_cc?: number | null;
+  writing_t1_lr?: number | null;
+  writing_t1_gra?: number | null;
+  writing_t1_band?: number | null;
+  writing_t2_question?: string | null;
+  writing_t2_essay?: string | null;
+  writing_t2_ta?: number | null;
+  writing_t2_cc?: number | null;
+  writing_t2_lr?: number | null;
+  writing_t2_gra?: number | null;
+  writing_t2_band?: number | null;
+  writing_band?: number | null;
+  speaking_recording_url?: string | null;
+  speaking_band?: number | null;
+  overall_band?: number | null;
 }
-

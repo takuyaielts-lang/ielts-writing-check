@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "IELTS Writing Level Check",
-  description: "Professional IELTS Writing assessment tool",
+  title: "IELTS Level Check",
+  description: "4技能統合IELTSレベルチェック",
 };
 
 export default function RootLayout({
