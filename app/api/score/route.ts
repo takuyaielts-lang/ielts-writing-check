@@ -1,25 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
 import { supabaseAdmin } from "@/lib/supabase";
 
-// Vercel Hobby: 60秒 / Pro: 300秒まで延長可能
 export const maxDuration = 60;
 
-// クライアントはリクエスト時に生成（環境変数の読み込みタイミング問題を回避）
-function getClient() {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    throw new Error("ANTHROPIC_API_KEY is not set in environment variables");
-  }
-  return new Anthropic({
-    apiKey,
-    timeout: 50_000,   // 50秒（maxDuration 60秒より短く設定）
-    maxRetries: 1,
-  });
-}
-
 export async function POST(req: NextRequest) {
-  // 環境変数の確認ログ（Vercelのログで確認可能）
   console.log("[score] ANTHROPIC_API_KEY present:", !!process.env.ANTHROPIC_API_KEY);
   console.log("[score] SUPABASE_URL present:", !!process.env.SUPABASE_URL);
 
@@ -33,7 +17,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "エッセイが入力されていません。" }, { status: 400 });
     }
 
-    const client = getClient();
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      throw new Error("ANTHROPIC_API_KEY is not set in environment variables");
+    }
 
     const criterionName = taskType === "task1" ? "Task Achievement (TA)" : "Task Response (TR)";
 
@@ -76,23 +63,40 @@ Respond ONLY with valid JSON in exactly this format (no markdown, no code blocks
   "detailed_feedback": "<Detailed feedback in Japanese, 3-4 paragraphs covering all four criteria. Be specific, cite examples from the essay where possible. Use \\n between paragraphs.>"
 }`;
 
-    console.log("[score] Calling Anthropic API...");
+    console.log("[score] Calling Anthropic API via fetch...");
 
-    const message = await client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 1500,
-      messages: [{ role: "user", content: prompt }],
+    const anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1500,
+        messages: [{ role: "user", content: prompt }],
+      }),
     });
 
-    console.log("[score] Anthropic API responded. stop_reason:", message.stop_reason);
+    console.log("[score] Anthropic API status:", anthropicRes.status);
 
-    const raw = (message.content[0] as { type: string; text: string }).text.trim();
+    if (!anthropicRes.ok) {
+      const errText = await anthropicRes.text();
+      console.error("[score] Anthropic API error response:", errText);
+      throw new Error(`Anthropic API error ${anthropicRes.status}: ${errText}`);
+    }
+
+    const anthropicData = await anthropicRes.json();
+    const raw: string = anthropicData.content?.[0]?.text?.trim() ?? "";
+
+    console.log("[score] Raw response length:", raw.length);
 
     let parsed;
     try {
       parsed = JSON.parse(raw);
     } catch {
-      console.error("[score] JSON parse failed. Raw response:", raw.slice(0, 500));
+      console.error("[score] JSON parse failed. Raw:", raw.slice(0, 500));
       const match = raw.match(/\{[\s\S]*\}/);
       if (!match) throw new Error(`Invalid JSON from AI. Raw: ${raw.slice(0, 200)}`);
       parsed = JSON.parse(match[0]);
@@ -100,7 +104,7 @@ Respond ONLY with valid JSON in exactly this format (no markdown, no code blocks
 
     console.log("[score] Parsed scores:", parsed.scores);
 
-    // Save to Supabase (non-blocking, best-effort)
+    // Supabase保存（best-effort）
     try {
       const { error: dbError } = await supabaseAdmin.from("submissions").insert({
         task_type: taskType,
@@ -131,11 +135,10 @@ Respond ONLY with valid JSON in exactly this format (no markdown, no code blocks
     console.error("[score] Fatal error:", message);
     if (stack) console.error("[score] Stack:", stack);
 
-    // 開発時・デバッグ用に実際のエラーメッセージもレスポンスに含める
     return NextResponse.json(
       {
         error: "採点中にエラーが発生しました。しばらくしてから再試行してください。",
-        detail: message, // Vercel ログ確認用
+        detail: message,
       },
       { status: 500 }
     );
