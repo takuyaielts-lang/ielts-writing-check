@@ -58,6 +58,31 @@ export default function AdminPage() {
   const [editBand, setEditBand] = useState("");
   const [saving, setSaving] = useState(false);
 
+  // Delete
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+
+  const handleDelete = async (id: string) => {
+    setDeletingId(id);
+    try {
+      const res = await fetch("/api/admin/submissions", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json", "x-admin-password": storedPw },
+        body: JSON.stringify({ id }),
+      });
+      if (!res.ok) {
+        const d = await res.json();
+        alert(`削除エラー: ${d.error}`);
+        return;
+      }
+      setSubmissions((prev) => prev.filter((s) => s.id !== id));
+      if (selected?.id === id) setSelected(null);
+    } finally {
+      setDeletingId(null);
+      setConfirmId(null);
+    }
+  };
+
   const BANDS = ["3.0","3.5","4.0","4.5","5.0","5.5","6.0","6.5","7.0","7.5","8.0","8.5","9.0"];
 
   const fetchSubmissions = async (pw: string) => {
@@ -207,25 +232,77 @@ export default function AdminPage() {
               <div className="flex items-center justify-center h-full text-sm" style={{ color: "#4d6b57" }}>データなし</div>
             ) : (
               submissions.map((s) => (
-                <button key={s.id} onClick={() => setSelected(s)}
-                  className="w-full text-left px-5 py-4 border-b transition-colors"
-                  style={{ background: selected?.id === s.id ? "#152a1c" : "transparent", borderColor: BORDER }}
-                  onMouseEnter={(e) => { if (selected?.id !== s.id) (e.currentTarget as HTMLButtonElement).style.background = "#131f17"; }}
-                  onMouseLeave={(e) => { if (selected?.id !== s.id) (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-semibold text-sm" style={{ color: "#f0f7f2" }}>{s.name}</span>
-                    <span style={{ fontFamily: "DM Serif Display, serif", fontSize: 22, color: bandColor(s.overall_band) }}>
-                      {s.overall_band ? s.overall_band.toFixed(1) : "—"}
-                    </span>
+                <div key={s.id}
+                  className="border-b"
+                  style={{ background: selected?.id === s.id ? "#152a1c" : "transparent", borderColor: BORDER }}>
+
+                  {/* 確認バー */}
+                  {confirmId === s.id ? (
+                    <div className="px-5 py-3 flex items-center justify-between"
+                      style={{ background: "#1a1010", borderBottom: `1px solid #7f1d1d` }}>
+                      <span className="text-xs" style={{ color: "#fca5a5" }}>
+                        「{s.name}」のデータを削除しますか？
+                      </span>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setConfirmId(null)}
+                          className="text-xs px-3 py-1 rounded-lg border"
+                          style={{ borderColor: BORDER, color: "#9dd4b0" }}>
+                          キャンセル
+                        </button>
+                        <button
+                          onClick={() => handleDelete(s.id)}
+                          disabled={deletingId === s.id}
+                          className="text-xs px-3 py-1 rounded-lg font-semibold disabled:opacity-50"
+                          style={{ background: "#7f1d1d", color: "#fca5a5" }}>
+                          {deletingId === s.id ? "削除中..." : "削除する"}
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {/* 行本体 */}
+                  <div className="flex items-start gap-0">
+                    {/* クリックで詳細表示 */}
+                    <button
+                      onClick={() => setSelected(s)}
+                      className="flex-1 text-left px-5 py-4 transition-colors"
+                      style={{ background: "transparent" }}
+                      onMouseEnter={(e) => { if (selected?.id !== s.id) (e.currentTarget as HTMLButtonElement).style.background = "#131f17"; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-semibold text-sm" style={{ color: "#f0f7f2" }}>{s.name}</span>
+                        <span style={{ fontFamily: "DM Serif Display, serif", fontSize: 22, color: bandColor(s.overall_band) }}>
+                          {s.overall_band ? s.overall_band.toFixed(1) : "—"}
+                        </span>
+                      </div>
+                      <div className="flex gap-3 text-xs" style={{ color: "#4d6b57" }}>
+                        <span>L: <strong style={{ color: bandColor(s.listening_band) }}>{s.listening_band?.toFixed(1) ?? "—"}</strong></span>
+                        <span>R: <strong style={{ color: bandColor(s.reading_band) }}>{s.reading_band?.toFixed(1) ?? "—"}</strong></span>
+                        <span>W: <strong style={{ color: bandColor(s.writing_band) }}>{s.writing_band?.toFixed(1) ?? "—"}</strong></span>
+                        <span>S: <strong style={{ color: bandColor(s.speaking_band) }}>{s.speaking_band?.toFixed(1) ?? "採点待"}</strong></span>
+                      </div>
+                      <p className="text-xs mt-1" style={{ color: "#2e6044" }}>{fmt(s.created_at)}</p>
+                    </button>
+
+                    {/* 削除ボタン */}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setConfirmId(s.id); }}
+                      disabled={deletingId === s.id}
+                      className="shrink-0 self-stretch px-3 flex items-center justify-center transition-colors disabled:opacity-30"
+                      title="削除"
+                      style={{ color: "#4d6b57" }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = "#f87171")}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = "#4d6b57")}>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6l-1 14H6L5 6" />
+                        <path d="M10 11v6M14 11v6" />
+                        <path d="M9 6V4h6v2" />
+                      </svg>
+                    </button>
                   </div>
-                  <div className="flex gap-3 text-xs" style={{ color: "#4d6b57" }}>
-                    <span>L: <strong style={{ color: bandColor(s.listening_band) }}>{s.listening_band?.toFixed(1) ?? "—"}</strong></span>
-                    <span>R: <strong style={{ color: bandColor(s.reading_band) }}>{s.reading_band?.toFixed(1) ?? "—"}</strong></span>
-                    <span>W: <strong style={{ color: bandColor(s.writing_band) }}>{s.writing_band?.toFixed(1) ?? "—"}</strong></span>
-                    <span>S: <strong style={{ color: bandColor(s.speaking_band) }}>{s.speaking_band?.toFixed(1) ?? "採点待"}</strong></span>
-                  </div>
-                  <p className="text-xs mt-1" style={{ color: "#2e6044" }}>{fmt(s.created_at)}</p>
-                </button>
+                </div>
               ))
             )}
           </div>
@@ -244,6 +321,31 @@ export default function AdminPage() {
                 <div>
                   <h2 style={{ fontFamily: "DM Serif Display, serif", fontSize: 24, color: "#f0f7f2" }}>{selected.name}</h2>
                   <p className="text-xs mt-1" style={{ color: "#4d6b57" }}>{fmt(selected.created_at)}</p>
+                  {/* 詳細パネルからの削除ボタン */}
+                  {confirmId === selected.id ? (
+                    <div className="flex items-center gap-2 mt-2">
+                      <span className="text-xs" style={{ color: "#fca5a5" }}>本当に削除しますか？</span>
+                      <button onClick={() => handleDelete(selected.id)} disabled={deletingId === selected.id}
+                        className="text-xs px-3 py-1 rounded-lg font-semibold disabled:opacity-50"
+                        style={{ background: "#7f1d1d", color: "#fca5a5" }}>
+                        {deletingId === selected.id ? "削除中..." : "削除する"}
+                      </button>
+                      <button onClick={() => setConfirmId(null)}
+                        className="text-xs px-2 py-1 rounded-lg border"
+                        style={{ borderColor: BORDER, color: "#9dd4b0" }}>取消</button>
+                    </div>
+                  ) : (
+                    <button onClick={() => setConfirmId(selected.id)}
+                      className="mt-2 flex items-center gap-1.5 text-xs transition-colors"
+                      style={{ color: "#4d6b57" }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = "#f87171")}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = "#4d6b57")}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4h6v2" />
+                      </svg>
+                      このデータを削除
+                    </button>
+                  )}
                 </div>
                 <div className="text-right">
                   <p className="text-xs uppercase tracking-widest mb-1" style={{ color: "#4d6b57" }}>Overall</p>
