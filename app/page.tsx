@@ -483,7 +483,50 @@ export default function Home() {
           <div className="text-center">
             <p className="text-xs uppercase tracking-widest mb-2" style={{ color: "#c9a84c" }}>Step 1</p>
             <h2 style={{ fontFamily: "DM Serif Display, serif", fontSize: 40, color: "#f0f7f2" }}>Listening</h2>
-            <p className="text-sm mt-2" style={{ color: "#6ab98a" }}>10問中の正答数を入力してください</p>
+          </div>
+
+          {/* IDP案内カード */}
+          <div className="w-[560px] rounded-2xl p-6" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+            <div className="flex items-start gap-4">
+              <div className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center mt-0.5"
+                style={{ background: "#1a3323" }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6ab98a" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" /><path d="M12 8v4l3 3" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-semibold tracking-widest uppercase mb-2" style={{ color: "#c9a84c" }}>
+                  テスト受験のご案内
+                </p>
+                <p className="text-sm leading-6 mb-4" style={{ color: "#d0ead9" }}>
+                  まず下のリンクからIDPの無料レベルチェックテストを受けてください。<br />
+                  リスニング10問・リーディング10問、約25分です。
+                </p>
+                <a
+                  href="https://ieltsjp.com/japan/prepare/article-level-check-tool"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all"
+                  style={{ background: "linear-gradient(135deg,#2e6044,#4d9970)", color: "#f0f7f2", textDecoration: "none" }}
+                  onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.85")}
+                  onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+                >
+                  IDPレベルチェックテストを受ける
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+            <div className="mt-4 pt-4 flex items-center gap-2" style={{ borderTop: `1px solid ${BORDER}` }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4d9970" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <p className="text-xs" style={{ color: "#6ab98a" }}>
+                テストが終わったら、正答数を入力してください。
+              </p>
+            </div>
           </div>
 
           {/* Number picker */}
@@ -532,7 +575,50 @@ export default function Home() {
           <div className="text-center">
             <p className="text-xs uppercase tracking-widest mb-2" style={{ color: "#c9a84c" }}>Step 2</p>
             <h2 style={{ fontFamily: "DM Serif Display, serif", fontSize: 40, color: "#f0f7f2" }}>Reading</h2>
-            <p className="text-sm mt-2" style={{ color: "#6ab98a" }}>10問中の正答数を入力してください</p>
+          </div>
+
+          {/* IDP案内カード */}
+          <div className="w-[560px] rounded-2xl p-6" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+            <div className="flex items-start gap-4">
+              <div className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center mt-0.5"
+                style={{ background: "#1a3323" }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6ab98a" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" /><path d="M12 8v4l3 3" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-semibold tracking-widest uppercase mb-2" style={{ color: "#c9a84c" }}>
+                  テスト受験のご案内
+                </p>
+                <p className="text-sm leading-6 mb-4" style={{ color: "#d0ead9" }}>
+                  まず下のリンクからIDPの無料レベルチェックテストを受けてください。<br />
+                  リスニング10問・リーディング10問、約25分です。
+                </p>
+                <a
+                  href="https://ieltsjp.com/japan/prepare/article-level-check-tool"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all"
+                  style={{ background: "linear-gradient(135deg,#2e6044,#4d9970)", color: "#f0f7f2", textDecoration: "none" }}
+                  onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.85")}
+                  onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+                >
+                  IDPレベルチェックテストを受ける
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+            <div className="mt-4 pt-4 flex items-center gap-2" style={{ borderTop: `1px solid ${BORDER}` }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4d9970" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <p className="text-xs" style={{ color: "#6ab98a" }}>
+                テストが終わったら、正答数を入力してください。
+              </p>
+            </div>
           </div>
 
           <div className="grid grid-cols-11 gap-2">
