@@ -993,74 +993,125 @@ export default function Home() {
       );
     };
 
+    const overallColor = overallBand
+      ? (overallBand >= 7.5 ? "#6ab98a" : overallBand >= 6.0 ? "#c9a84c" : "#f87171")
+      : "#4d6b57";
+
     return (
       <div className="min-h-screen flex flex-col" style={{ background: BG }}>
         <Header />
-        <main className="flex-1 flex flex-col items-center justify-center px-10 py-12">
-          {/* Name */}
-          <p className="text-sm mb-6" style={{ color: "#4d6b57" }}>受験者：<strong style={{ color: "#f0f7f2" }}>{name}</strong></p>
 
-          {/* Overall */}
-          <div className="mb-8 text-center">
-            <p className="text-xs uppercase tracking-widest mb-2" style={{ color: "#c9a84c" }}>Overall Band Score</p>
-            {overallBand !== null ? (
-              <span style={{ fontFamily: "DM Serif Display, serif", fontSize: 96, lineHeight: 1, color: overallBand >= 7.5 ? "#6ab98a" : overallBand >= 6.0 ? "#c9a84c" : "#f87171" }}>
-                {overallBand.toFixed(1)}
-              </span>
-            ) : (
+        {/* スクロール可能なメインエリア */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="max-w-5xl mx-auto px-8 py-8">
+
+            {/* 受験者名 + 全体タイトル */}
+            <div className="flex items-center justify-between mb-6">
               <div>
-                <span style={{ fontFamily: "DM Serif Display, serif", fontSize: 40, color: "#4d6b57" }}>
-                  {bands.length > 0 ? `${(bands.reduce((a, b) => a + b, 0) / bands.length).toFixed(1)}*` : "—"}
-                </span>
-                <p className="text-xs mt-1" style={{ color: "#4d6b57" }}>*Speakingスコア入力後に確定します</p>
+                <p className="text-xs uppercase tracking-widest mb-1" style={{ color: "#4d6b57" }}>受験者</p>
+                <p style={{ fontFamily: "DM Serif Display, serif", fontSize: 22, color: "#f0f7f2" }}>{name}</p>
               </div>
-            )}
-          </div>
+              <button
+                onClick={() => { setStep("home"); setName(""); setListenCorrect(null); setReadCorrect(null); setT1Essay(""); setT2Essay(""); setT1Result(null); setT2Result(null); setSpeakingBand(""); setSpeakingUrl(null); setLocalAudioUrl(null); setRecordState("idle"); setWritingSub("t1-write"); }}
+                className="px-5 py-2 rounded-xl text-sm border transition-all"
+                style={{ borderColor: BORDER, color: "#9dd4b0" }}
+              >
+                最初からやり直す
+              </button>
+            </div>
 
-          {/* Skill breakdown */}
-          <div className="w-[480px] rounded-2xl px-8 py-2" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
-            <SkillRow label="Listening" band={listenBand} sub={`正答数 ${listenCorrect}/10`} />
-            <SkillRow label="Reading" band={readBand} sub={`正答数 ${readCorrect}/10`} />
-            <SkillRow label="Writing" band={writingBand} sub={t1Result && t2Result ? `T1: ${t1Result.scores.band.toFixed(1)} / T2: ${t2Result.scores.band.toFixed(1)}` : ""} />
-            <SkillRow label="Speaking" band={spBandNum} sub={speakingUrl ? "録音あり" : "録音なし"} />
-          </div>
+            {/* 上段：Overall + 4技能スコア */}
+            <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: "200px 1fr" }}>
 
-          {/* Writing detail */}
-          {(t1Result || t2Result) && (
-            <div className="mt-6 w-[480px] rounded-2xl p-6" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
-              <p className="text-xs uppercase tracking-widest mb-4" style={{ color: "#4d6b57" }}>Writing 詳細</p>
-              <div className="flex justify-around">
-                {t1Result && (
-                  <div className="text-center">
-                    <p className="text-xs mb-2" style={{ color: "#c9a84c" }}>Task 1</p>
-                    <div className="flex gap-3">
-                      {[["TA", t1Result.scores.ta, "#6ab98a"], ["CC", t1Result.scores.cc, "#7ba7d0"], ["LR", t1Result.scores.lr, "#c9a84c"], ["GRA", t1Result.scores.gra, "#b08fda"]].map(([l, s, c]) => (
-                        <ScoreRing key={String(l)} label={String(l)} score={Number(s)} color={String(c)} />
-                      ))}
-                    </div>
-                  </div>
+              {/* Overall */}
+              <div className="rounded-2xl p-6 flex flex-col items-center justify-center text-center"
+                style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+                <p className="text-xs uppercase tracking-widest mb-2" style={{ color: "#c9a84c" }}>Overall</p>
+                {overallBand !== null ? (
+                  <>
+                    <span style={{ fontFamily: "DM Serif Display, serif", fontSize: 72, lineHeight: 1, color: overallColor }}>
+                      {overallBand.toFixed(1)}
+                    </span>
+                    <p className="text-xs mt-1" style={{ color: "#4d6b57" }}>Band Score</p>
+                  </>
+                ) : (
+                  <>
+                    <span style={{ fontFamily: "DM Serif Display, serif", fontSize: 48, color: "#4d6b57" }}>
+                      {bands.length > 0 ? `${roundHalf(bands.reduce((a, b) => a + b, 0) / bands.length).toFixed(1)}` : "—"}
+                    </span>
+                    <p className="text-xs mt-1" style={{ color: "#4d6b57" }}>Speakingスコア待ち</p>
+                  </>
                 )}
-                {t2Result && (
-                  <div className="text-center">
-                    <p className="text-xs mb-2" style={{ color: "#c9a84c" }}>Task 2</p>
-                    <div className="flex gap-3">
-                      {[["TA", t2Result.scores.ta, "#6ab98a"], ["CC", t2Result.scores.cc, "#7ba7d0"], ["LR", t2Result.scores.lr, "#c9a84c"], ["GRA", t2Result.scores.gra, "#b08fda"]].map(([l, s, c]) => (
-                        <ScoreRing key={String(l)} label={String(l)} score={Number(s)} color={String(c)} />
-                      ))}
+              </div>
+
+              {/* 4技能スコアカード（2×2グリッド） */}
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: "Listening", band: listenBand, sub: `正答数 ${listenCorrect ?? "—"}/10` },
+                  { label: "Reading",   band: readBand,   sub: `正答数 ${readCorrect ?? "—"}/10` },
+                  { label: "Writing",   band: writingBand, sub: t1Result && t2Result ? `T1: ${t1Result.scores.band.toFixed(1)}　T2: ${t2Result.scores.band.toFixed(1)}` : "採点待ち" },
+                  { label: "Speaking",  band: spBandNum,   sub: speakingUrl ? "録音あり" : "録音なし" },
+                ].map(({ label, band, sub }) => {
+                  const c = band ? (band >= 7.5 ? "#6ab98a" : band >= 6.0 ? "#c9a84c" : "#f87171") : "#4d6b57";
+                  return (
+                    <div key={label} className="rounded-xl px-5 py-4 flex items-center justify-between"
+                      style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+                      <div className="min-w-0">
+                        <p style={{ fontFamily: "DM Serif Display, serif", fontSize: 16, color: "#f0f7f2" }}>{label}</p>
+                        <p className="text-xs truncate" style={{ color: "#4d6b57" }}>{sub}</p>
+                      </div>
+                      <span className="ml-4 shrink-0" style={{ fontFamily: "DM Serif Display, serif", fontSize: 36, color: c, lineHeight: 1 }}>
+                        {band !== null ? band.toFixed(1) : <span style={{ fontSize: 13, color: "#4d6b57" }}>採点待ち</span>}
+                      </span>
                     </div>
-                  </div>
-                )}
+                  );
+                })}
               </div>
             </div>
-          )}
 
-          <button
-            onClick={() => { setStep("home"); setName(""); setListenCorrect(null); setReadCorrect(null); setT1Essay(""); setT2Essay(""); setT1Result(null); setT2Result(null); setSpeakingBand(""); setSpeakingUrl(null); setLocalAudioUrl(null); setRecordState("idle"); setWritingSub("t1-write"); }}
-            className="mt-8 px-8 py-3 rounded-xl text-sm border transition-all"
-            style={{ borderColor: BORDER, color: "#9dd4b0" }}
-          >
-            最初からやり直す
-          </button>
+            {/* Writing 詳細（T1 + T2 スコアリング） */}
+            {(t1Result || t2Result) && (
+              <div className="rounded-2xl p-6" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+                <p className="text-xs uppercase tracking-widest mb-5" style={{ color: "#4d6b57" }}>Writing 詳細スコア</p>
+                <div className="grid gap-6" style={{ gridTemplateColumns: t1Result && t2Result ? "1fr 1fr" : "1fr" }}>
+                  {t1Result && (
+                    <div>
+                      <div className="flex items-center justify-between mb-4">
+                        <p className="text-sm font-semibold" style={{ color: "#c9a84c" }}>Task 1</p>
+                        <span style={{ fontFamily: "DM Serif Display, serif", fontSize: 24, color: t1Result.scores.band >= 7 ? "#6ab98a" : t1Result.scores.band >= 6 ? "#c9a84c" : "#f87171" }}>
+                          Band {t1Result.scores.band.toFixed(1)}
+                        </span>
+                      </div>
+                      <div className="flex gap-4 justify-center">
+                        {[["TA", t1Result.scores.ta, "#6ab98a"], ["CC", t1Result.scores.cc, "#7ba7d0"], ["LR", t1Result.scores.lr, "#c9a84c"], ["GRA", t1Result.scores.gra, "#b08fda"]].map(([l, s, c]) => (
+                          <ScoreRing key={String(l)} label={String(l)} score={Number(s)} color={String(c)} />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {t1Result && t2Result && (
+                    <div className="self-stretch w-px" style={{ background: BORDER }} />
+                  )}
+                  {t2Result && (
+                    <div>
+                      <div className="flex items-center justify-between mb-4">
+                        <p className="text-sm font-semibold" style={{ color: "#c9a84c" }}>Task 2</p>
+                        <span style={{ fontFamily: "DM Serif Display, serif", fontSize: 24, color: t2Result.scores.band >= 7 ? "#6ab98a" : t2Result.scores.band >= 6 ? "#c9a84c" : "#f87171" }}>
+                          Band {t2Result.scores.band.toFixed(1)}
+                        </span>
+                      </div>
+                      <div className="flex gap-4 justify-center">
+                        {[["TA", t2Result.scores.ta, "#6ab98a"], ["CC", t2Result.scores.cc, "#7ba7d0"], ["LR", t2Result.scores.lr, "#c9a84c"], ["GRA", t2Result.scores.gra, "#b08fda"]].map(([l, s, c]) => (
+                          <ScoreRing key={String(l)} label={String(l)} score={Number(s)} color={String(c)} />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+          </div>
         </main>
       </div>
     );
